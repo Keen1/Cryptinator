@@ -2,14 +2,13 @@ package main;
 import net.sourceforge.argparse4j.*;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import net.sourceforge.argparse4j.inf.Namespace;
 
-import java.util.List;
+
 
 public class Main {
     public static void main(String[] args){
         ArgumentParser parser = getArgParser();
-        Namespace ns = null;
+        Encryptinator encryptinator = new Encryptinator();
         try{
             System.out.println(parser.parseArgs(args));
 
