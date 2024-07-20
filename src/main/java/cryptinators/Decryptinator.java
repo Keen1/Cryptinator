@@ -9,10 +9,7 @@ public class Decryptinator extends Cryptinator {
         super(path, key);
     }
     public void run(){
-        System.out.println("My class: " + this.getClass());
-        System.out.println(this.getPath());
-        System.out.println(Thread.currentThread());
-        System.out.println(Thread.activeCount());
+
     }
 
 }

@@ -42,7 +42,7 @@ public abstract class Cryptinator implements Runnable{
     public SecretKey getKey(){
         return this.key;
     }
-
+    //key helper methods
     public String encodeKey(SecretKey key){
         return Base64.getEncoder().encodeToString(key.getEncoded());
 

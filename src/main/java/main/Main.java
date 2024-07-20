@@ -26,6 +26,7 @@ public class Main {
 
 
 
+
     }
 
     //validate user arguments and that they are a valid configuration
@@ -46,13 +47,6 @@ public class Main {
             }
             //verify the paths or directories provided.
             verifyPaths(paths);
-
-        //if the mode isn't present then at LEAST a utility like --generate-key should be used
-        //otherwise the config is invalid.
-        }else{
-
-            Integer keyLength = ns.getInt("generate_key");
-
         }
     }
 
