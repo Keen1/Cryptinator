@@ -35,7 +35,7 @@ public class Main {
         System.out.println(namespace);
 
         try{
-
+            Scanner scan = new Scanner(System.in);
             //validate arguments
             String mode = validateArgs(namespace);
 
@@ -46,62 +46,96 @@ public class Main {
             //check for key file
             //note - if no key file is used on encrypt mode, --generate-key is implied.
             String keyPath = namespace.getString("key_file");
-            SecretKey key;
+            SecretKey key = null;
+
+            //check and see if --generate-key was used
+            /*
+            * Design issue here
+            * Checking to see if generate key was used and generate a key based on the
+            * length provided by a user - lengths are constrained to choices in the arg
+            * parser of 128, 192, 256 bits
+            * Given the user specified length, a key should be generated. But this code is
+            * repeated if the encrypt mode is specified and no key_file is passed
+            * */
+            Integer keyLength = namespace.getInt("generate_key");
+            if(keyLength != null){
+
+                //create the key
+                key = KeyCreator.generateKey(keyLength);
+                StringBuilder builder = new StringBuilder();
+                builder.append("A ").append(keyLength).append("-bit key was generated.\n");
+                String keyStr = Base64.getEncoder().encodeToString(key.getEncoded());
+                builder.append("Key: \n").append(keyStr).append("\n");
+                builder.append("Press [ENTER] to continue after saving your key.\n");
+                System.out.println(builder.toString());
+                scan.nextLine();
+
+
+
+            }
+
 
             //instantiate the controller
             Controller cryptController;
-            if(mode.equals("encrypt")){
+            if(mode != null){
+                if(mode.equals("encrypt")){
 
-                if(keyPath == null){
+                    if(keyPath == null){
 
-                    //need to revisit hardcoding this
-                    try{
-                        //generate a key
-                        key = KeyCreator.generateKey(256);
-                        //set the controller
+                        //need to revisit hardcoding this
+                        try{
+                            if(key == null){
+                                //generate a key
+                                key = KeyCreator.generateKey(256);
+                                //set the controller
+
+
+                                /*
+                                 * create a message for the user to display the b64 encoded key so they can save it
+                                 * */
+                                String b64KeyString = Base64.getEncoder().encodeToString(key.getEncoded());
+
+                                String keyMessage = """
+                                You did not specify a key for encryption. One has been generated for you. Please store this 
+                                key securely for reuse upon decryption.
+                                AES 256-bit key: \n""" + b64KeyString;
+                                System.out.println(keyMessage + "\n");
+                                System.out.println("Please press [ENTER] to continue after saving your key. ");
+                                scan.nextLine();
+                            }
+
+
+                            //execute the controller
+                            cryptController = new EncrypterController(key, paths);
+                            cryptController.execute();
+
+                        }catch(NoSuchAlgorithmException | InvalidParameterException e){
+                            System.out.println(e.getMessage());
+                        }
+                        //key path is valid
+                    }else{
+
+                        String encKeyStr = KeyCreator.readEncodedKeyFromFile(keyPath);
+                        key = KeyCreator.generateSecretKeyFromUser(encKeyStr);
                         cryptController = new EncrypterController(key, paths);
-
-                        /*
-                        * create a message for the user to display the b64 encoded key so they can save it
-                        * */
-                        String b64KeyString = Base64.getEncoder().encodeToString(key.getEncoded());
-                        Scanner scan = new Scanner(System.in);
-                        String keyMessage = """
-                            You did not specify a key for encryption. One has been generated for you. Please store this 
-                            key securely for reuse upon decryption.
-                            AES 256-bit key: \n""" + b64KeyString;
-                        System.out.println(keyMessage + "\n");
-                        System.out.println("Please press [ENTER] to continue after saving your key. ");
-                        scan.nextLine();
 
                         //execute the controller
                         cryptController.execute();
-
-                    }catch(NoSuchAlgorithmException | InvalidParameterException e){
-                        System.out.println(e.getMessage());
                     }
-                //key path is valid
+                    //decrypting - requires keypath
                 }else{
 
-                    String encKeyStr = KeyCreator.readEncodedKeyFromFile(keyPath);
-                    key = KeyCreator.generateSecretKeyFromUser(encKeyStr);
-                    cryptController = new EncrypterController(key, paths);
+                    String keyStr = KeyCreator.readEncodedKeyFromFile(keyPath);
+                    key = KeyCreator.generateSecretKeyFromUser(keyStr);
+                    cryptController = new DecrypterController(key, paths);
 
                     //execute the controller
                     cryptController.execute();
                 }
-            //decrypting - requires keypath
-            }else{
-
-                String keyStr = KeyCreator.readEncodedKeyFromFile(keyPath);
-                key = KeyCreator.generateSecretKeyFromUser(keyStr);
-                cryptController = new DecrypterController(key, paths);
-
-                //execute the controller
-                cryptController.execute();
             }
 
-        }catch(RuntimeException  | IOException e){
+
+        }catch(RuntimeException | IOException | NoSuchAlgorithmException e){
             System.out.println(e.getMessage());
         }
     }
@@ -165,13 +199,13 @@ public class Main {
     private static void verifyPath(String pathStr)throws InvalidPathException{
         Path path = Paths.get(pathStr);
         if(!Files.exists(path)){
-            throw new InvalidPathException(pathStr, "Path  does not exist.");
+            throw new InvalidPathException(pathStr, "Path  does not exist");
         }
         if(!Files.isReadable(path)){
-            throw new InvalidPathException(pathStr,  "Path is not readable.");
+            throw new InvalidPathException(pathStr,  "Path is not readable");
         }
         if (!Files.isWritable(path)) {
-            throw new InvalidPathException(pathStr,  "Path is not writable.");
+            throw new InvalidPathException(pathStr,  "Path is not writable");
         }
 
     }
@@ -224,7 +258,6 @@ public class Main {
 
         ap.addArgument("--generate-key")
                 .type(Integer.class)
-                .setDefault()
                 .required(false)
                 .choices(128, 192, 256)
                 .help("Generate a key. Supports 128, 192, and 256 bit AES keys.");
