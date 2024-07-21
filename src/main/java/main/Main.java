@@ -32,6 +32,7 @@ public class Main {
     public static void getNamespaceAndExec(String[] args){
         //get the namespace
         Namespace namespace = getNamespace(args);
+        System.out.println(namespace);
 
         try{
 
@@ -86,14 +87,17 @@ public class Main {
                     key = KeyCreator.generateSecretKeyFromUser(encKeyStr);
                     cryptController = new EncrypterController(key, paths);
 
+                    //execute the controller
                     cryptController.execute();
                 }
+            //decrypting - requires keypath
+            }else{
 
-            }else if (mode.equals("decrypt")){
                 String keyStr = KeyCreator.readEncodedKeyFromFile(keyPath);
                 key = KeyCreator.generateSecretKeyFromUser(keyStr);
                 cryptController = new DecrypterController(key, paths);
 
+                //execute the controller
                 cryptController.execute();
             }
 
@@ -131,10 +135,16 @@ public class Main {
                         Invalid argument specifications.
                         Decrypt mode was specified but no key was provided.""";
                 throw new RuntimeException(message);
+
+            //validate the keyfile
+            }else if(mode.equals("decrypt")){
+                verifyPath(ns.getString("key_file"));
             }
 
-            //validate the key file's existence
-            //verifyPath(ns.getString("key_file"));
+
+
+
+
 
 
 
@@ -220,7 +230,7 @@ public class Main {
                 .help("Generate a key. Supports 128, 192, and 256 bit AES keys.");
 
         ap.addArgument("--key-file")
-                .nargs(1)
+                .type(String.class)
                 .help("Read a private key from a file.");
 
 

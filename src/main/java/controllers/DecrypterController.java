@@ -15,7 +15,7 @@ public class DecrypterController extends Controller{
     }
     @Override
     public void execute(){
-        Cryptinator cryptinator = null;
+        Cryptinator cryptinator;
         try(ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())){
             for(String path: this.getPaths()){
                 cryptinator = new Decryptinator(path, this.getKey());

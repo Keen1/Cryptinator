@@ -5,6 +5,8 @@ import javax.crypto.spec.IvParameterSpec;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -16,7 +18,7 @@ public class Decryptinator extends Cryptinator {
         super(path, key);
     }
     public void run(){
-        IvParameterSpec ivParam = null;
+        IvParameterSpec ivParam;
 
         try(FileInputStream fileInputStream = new FileInputStream(this.getPath())){
 
@@ -42,13 +44,12 @@ public class Decryptinator extends Cryptinator {
                 }
 
                 fileOutputStream.flush();
+                Files.delete(Paths.get(this.getPath()));
             }
 
-        }catch(IOException e){
+        }catch(IOException | InvalidAlgorithmParameterException | NoSuchPaddingException | InvalidKeyException |
+               NoSuchAlgorithmException e){
             System.out.println(e.getMessage());
-        } catch (InvalidAlgorithmParameterException | NoSuchPaddingException | InvalidKeyException |
-                 NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
         }
 
     }
