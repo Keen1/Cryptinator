@@ -11,8 +11,8 @@ public class Encryptinator extends Cryptinator {
     }
     @Override
     public void run(){
-        SecretKey key = this.getKey();
-        System.out.println(key.getAlgorithm());
+        System.out.println("here");
+
 
     }
 

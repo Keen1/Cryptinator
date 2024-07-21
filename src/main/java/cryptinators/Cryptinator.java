@@ -42,36 +42,7 @@ public abstract class Cryptinator implements Runnable{
     public SecretKey getKey(){
         return this.key;
     }
-    //key helper methods
-    public String encodeKey(SecretKey key){
-        return Base64.getEncoder().encodeToString(key.getEncoded());
 
-
-    }
-    public byte[] decodeKey(String encodedKey){
-        return Base64.getDecoder().decode(encodedKey);
-    }
-    public String readEncodedKeyFromFile(String path) throws IOException {
-        byte[] content = Files.readAllBytes(Paths.get(path));
-        return new String(content);
-    }
-
-    public SecretKey generateSecretKeyFromUser(String encodedKey){
-        byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
-        return new SecretKeySpec(decodedKey, "AES");
-
-    }
-    public SecretKey generateKey(int keySize) throws NoSuchAlgorithmException, InvalidParameterException{
-        if(keySize != 128 && keySize != 192 && keySize != 256){
-            throw new InvalidParameterException("Invalid key size for AES. Key size must be 128, 192, or 256 bits.");
-
-        }
-        //this will need to be parameterized if we wish to support diff algorithms
-        KeyGenerator keyGen  = KeyGenerator.getInstance("AES");
-        keyGen.init(keySize);
-        return keyGen.generateKey();
-
-    }
 
 
 

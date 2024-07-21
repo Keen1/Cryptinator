@@ -9,7 +9,7 @@ public class Decryptinator extends Cryptinator {
         super(path, key);
     }
     public void run(){
-
+        System.out.println("Here.");
     }
 
 }
