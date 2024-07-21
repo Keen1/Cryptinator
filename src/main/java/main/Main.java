@@ -85,6 +85,7 @@ public class Main {
                     String encKeyStr = KeyCreator.readEncodedKeyFromFile(keyPath);
                     key = KeyCreator.generateSecretKeyFromUser(encKeyStr);
                     cryptController = new EncrypterController(key, paths);
+
                     cryptController.execute();
                 }
 
@@ -92,6 +93,7 @@ public class Main {
                 String keyStr = KeyCreator.readEncodedKeyFromFile(keyPath);
                 key = KeyCreator.generateSecretKeyFromUser(keyStr);
                 cryptController = new DecrypterController(key, paths);
+
                 cryptController.execute();
             }
 
