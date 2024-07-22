@@ -187,7 +187,7 @@ public class Main {
     }
 
     //verify any paths passed by the user
-    private static void verifyPaths(List<String> paths){
+    public static void verifyPaths(List<String> paths){
         for(String pathStr : paths){
 
             verifyPath(pathStr);
@@ -196,7 +196,7 @@ public class Main {
     }
 
     //verify path helper
-    private static void verifyPath(String pathStr)throws InvalidPathException{
+    public static void verifyPath(String pathStr)throws InvalidPathException{
         Path path = Paths.get(pathStr);
         if(!Files.exists(path)){
             throw new InvalidPathException(pathStr, "Path  does not exist");
@@ -211,7 +211,7 @@ public class Main {
     }
 
 
-
+    //get the namespace given the user arguments
     private static Namespace getNamespace(String[] args){
         //get the parser and init a namespace to null
         ArgumentParser parser = getArgParser();
@@ -236,6 +236,7 @@ public class Main {
 
     }
 
+    //generate an argparser with ArgParse4J
     private static ArgumentParser getArgParser(){
         ArgumentParser ap = ArgumentParsers.newFor("Cryptinator")
 

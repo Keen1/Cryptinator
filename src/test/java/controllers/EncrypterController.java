@@ -1,18 +1,20 @@
 package controllers;
 
 import cryptinators.Cryptinator;
-import cryptinators.Decryptinator;
+import cryptinators.Encryptinator;
+
 import javax.crypto.SecretKey;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class DecrypterController extends Controller{
+public class EncrypterController extends Controller{
 
-    public DecrypterController( SecretKey key, List<String> paths){
+    public EncrypterController(SecretKey key, List<String> paths){
         super(key, paths);
-        this.setMode("decrypt");
+        this.setMode("encrypt");
     }
+
     @Override
     public void execute(){
         Cryptinator cryptinator;
@@ -21,10 +23,10 @@ public class DecrypterController extends Controller{
 
         try(ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())){
             for(String path: this.getPaths()){
-                cryptinator = new Decryptinator(path, this.getKey());
+
+                cryptinator = new Encryptinator(path, this.getKey());
                 executor.submit(cryptinator);
             }
         }
-
     }
 }

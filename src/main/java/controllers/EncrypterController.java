@@ -17,8 +17,12 @@ public class EncrypterController extends Controller{
     @Override
     public void execute(){
         Cryptinator cryptinator;
+
+        this.checkForDirectories();
+
         try(ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())){
             for(String path: this.getPaths()){
+
                 cryptinator = new Encryptinator(path, this.getKey());
                 executor.submit(cryptinator);
             }
